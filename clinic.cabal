@@ -1,11 +1,11 @@
-cabal-version:   3.0
-name:            clinic
-version:         0.0.0.0
-license:         BSD-3-Clause
-license-file:    LICENSE
-author:          thelissimus
-maintainer:      thelissimus@tuta.io
-build-type:      Simple
+cabal-version: 3.0
+name:          clinic
+version:       0.0.0.0
+license:       BSD-3-Clause
+license-file:  LICENSE
+author:        thelissimus
+maintainer:    thelissimus@tuta.io
+build-type:    Simple
 
 common defaults
   default-language:   GHC2021
@@ -26,10 +26,11 @@ library
   build-depends:
     , aeson
     , base                   ^>=4.17.2.1
+    , bytestring
     , esqueleto
     , monad-logger
     , mtl
-    , optparse-applicative
+    , optparse-generic
     , persistent
     , persistent-postgresql
     , resource-pool
@@ -48,7 +49,7 @@ executable clinic
   import:         defaults, warnings
   main-is:        Main.hs
   build-depends:
-    , base     ^>=4.17.2.1
+    , base    ^>=4.17.2.1
     , clinic
 
   hs-source-dirs: app
@@ -59,5 +60,5 @@ test-suite clinic-test
   hs-source-dirs: test
   main-is:        Main.hs
   build-depends:
-    , base     ^>=4.17.2.1
+    , base    ^>=4.17.2.1
     , clinic

@@ -1,9 +1,13 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ImplicitParams #-}
 {-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
@@ -17,7 +21,6 @@ import Data.Aeson (FromJSON, ToJSON)
 import Data.Kind (Type)
 import Data.Pool (Pool, withResource)
 import Data.Proxy (Proxy (..))
-import Data.Text (Text)
 import Data.Time (UTCTime)
 import Database.Esqueleto.Experimental
 import Database.Persist.Postgresql (createPostgresqlPool)
@@ -25,11 +28,13 @@ import Database.Persist.TH
 
 import Network.Wai.Handler.Warp (run)
 
+import Options.Generic
+
 import Servant (Application)
 import Servant.API
-import Servant.API.Generic (Generic)
 import Servant.Server.Generic (AsServerT, genericServeT)
 
+import Data.ByteString (ByteString)
 import UnliftIO (MonadIO (..))
 
 type Sex :: Type
@@ -126,10 +131,22 @@ handlers =
 app :: (?pool :: Pool SqlBackend) => Application
 app = genericServeT liftIO handlers
 
+type Opts :: Type -> Type
+data Opts w = MkOpts
+  { port :: !(w ::: Int <?> "Port to listen on" <!> "8080" <#> "p")
+  , dbUrl :: !(w ::: ByteString <?> "Database connection string" <#> "u")
+  , dbPoolSize :: !(w ::: Int <?> "Database pool size" <!> "10" <#> "s")
+  }
+  deriving stock (Generic)
+
+deriving anyclass instance ParseRecord (Opts Wrapped)
+deriving stock instance Show (Opts Unwrapped)
+
 main :: IO ()
 main = do
-  pool <- runNoLoggingT $ createPostgresqlPool "" 10
+  (opts :: Opts Unwrapped) <- unwrapRecord "Clinic API"
+  pool <- runNoLoggingT $ createPostgresqlPool opts.dbUrl opts.dbPoolSize
   let ?pool = pool
   migrate'
   dbPatientGetAll >>= print
-  run 3030 app
+  run opts.port app
