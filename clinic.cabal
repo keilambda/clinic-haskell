@@ -11,8 +11,10 @@ common defaults
   default-language:   GHC2021
   default-extensions:
     BlockArguments
+    DeriveAnyClass
     DerivingStrategies
     LambdaCase
+    OverloadedRecordDot
 
 common warnings
   ghc-options:
@@ -22,7 +24,11 @@ common warnings
 
 library
   import:          defaults, warnings
-  exposed-modules: Clinic
+  exposed-modules:
+    Clinic
+    Clinic.API
+    Clinic.Database
+
   build-depends:
     , aeson
     , base                   ^>=4.17.2.1
