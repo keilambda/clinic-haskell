@@ -31,14 +31,10 @@ library
 
   build-depends:
     , aeson
-    , base                   ^>=4.17.2.1
-    , bytestring
+    , base            ^>=4.17.2.1
     , esqueleto
-    , monad-logger
     , mtl
-    , optparse-generic
     , persistent
-    , persistent-postgresql
     , resource-pool
     , servant
     , servant-server
@@ -47,7 +43,6 @@ library
     , time
     , transformers
     , unliftio
-    , warp
 
   hs-source-dirs:  src
 
@@ -55,8 +50,13 @@ executable clinic
   import:         defaults, warnings
   main-is:        Main.hs
   build-depends:
-    , base    ^>=4.17.2.1
+    , base                   ^>=4.17.2.1
+    , bytestring
     , clinic
+    , monad-logger
+    , optparse-generic
+    , persistent-postgresql
+    , warp
 
   hs-source-dirs: app
 
