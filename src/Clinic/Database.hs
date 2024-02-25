@@ -11,11 +11,11 @@ module Clinic.Database (
   PatientId,
   PoolSql,
   migrate',
-  dbPatientGetAll,
-  dbPatientGetOne,
-  dbPatientAdd,
-  dbPatientUpdate,
-  dbPatientDelete,
+  patientGetAll,
+  patientGetOne,
+  patientCreate,
+  patientUpdate,
+  patientDelete,
 )
 where
 
@@ -66,21 +66,21 @@ type PoolSql = (?pool :: Pool SqlBackend)
 withPool :: (?pool :: Pool s) => ReaderT s IO r -> IO r
 withPool = withResource ?pool . runReaderT
 
-dbPatientGetAll :: PoolSql => IO [Patient]
-dbPatientGetAll = map entityVal <$> withPool (select $ from table)
+patientGetAll :: PoolSql => IO [Patient]
+patientGetAll = map entityVal <$> withPool (select $ from table)
 
-dbPatientGetOne :: PoolSql => PatientId -> IO (Maybe Patient)
-dbPatientGetOne _id = fmap entityVal <$> withPool do
+patientGetOne :: PoolSql => PatientId -> IO (Maybe Patient)
+patientGetOne _id = fmap entityVal <$> withPool do
   selectOne do
     p <- from table
     where_ (p ^. PatientId ==. val _id)
     pure p
 
-dbPatientAdd :: PoolSql => Patient -> IO PatientId
-dbPatientAdd = withPool . insert
+patientCreate :: PoolSql => Patient -> IO PatientId
+patientCreate = withPool . insert
 
-dbPatientUpdate :: PoolSql => PatientId -> Patient -> IO ()
-dbPatientUpdate _id pt = withPool do
+patientUpdate :: PoolSql => PatientId -> Patient -> IO ()
+patientUpdate _id pt = withPool do
   update \p -> do
     set
       p
@@ -94,8 +94,8 @@ dbPatientUpdate _id pt = withPool do
       ]
     where_ (p ^. PatientId ==. val _id)
 
-dbPatientDelete :: PoolSql => PatientId -> IO ()
-dbPatientDelete _id = withPool do
+patientDelete :: PoolSql => PatientId -> IO ()
+patientDelete _id = withPool do
   delete do
     p <- from table
     where_ (p ^. PatientId ==. val _id)

@@ -24,7 +24,7 @@ type PatientRoutes :: Type -> Type
 data PatientRoutes route = MkPatientRoutes
   { _getAll :: route :- Get '[JSON] [Patient]
   , _getOne :: route :- Capture "id" PatientId :> Get '[JSON] (Maybe Patient)
-  , _addOne :: route :- ReqBody '[JSON] Patient :> Post '[JSON] PatientId
+  , _create :: route :- ReqBody '[JSON] Patient :> Post '[JSON] PatientId
   , _update :: route :- Capture "id" PatientId :> ReqBody '[JSON] Patient :> Put '[JSON] ()
   , _delete :: route :- Capture "id" PatientId :> Delete '[JSON] ()
   }
@@ -36,11 +36,11 @@ api = genericApi (Proxy :: Proxy PatientRoutes)
 handlers :: (PoolSql) => PatientRoutes (AsServerT IO)
 handlers =
   MkPatientRoutes
-    { _getAll = DB.dbPatientGetAll
-    , _getOne = DB.dbPatientGetOne
-    , _addOne = DB.dbPatientAdd
-    , _update = DB.dbPatientUpdate
-    , _delete = DB.dbPatientDelete
+    { _getAll = DB.patientGetAll
+    , _getOne = DB.patientGetOne
+    , _create = DB.patientCreate
+    , _update = DB.patientUpdate
+    , _delete = DB.patientDelete
     }
 
 app :: (PoolSql) => Application
